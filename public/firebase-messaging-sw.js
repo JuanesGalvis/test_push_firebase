@@ -1,10 +1,10 @@
-import { initializeApp } from "firebase/app";
-import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js');
 
 // Initialize the Firebase app in the service worker by passing in
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
-const firebaseApp = initializeApp({
+firebase.initializeApp({
     apiKey: process.env.NEXT_PUBLIC_apiKey,
     authDomain: process.env.NEXT_PUBLIC_authDomain,
     projectId: process.env.NEXT_PUBLIC_projectId,
@@ -15,8 +15,8 @@ const firebaseApp = initializeApp({
 
 // Retrieve an instance of Firebase Messaging so that it can handle background
 // messages.
-const messaging = getMessaging(firebaseApp);
-onBackgroundMessage(messaging, (payload) => {
+const messaging = firebase.messaging();
+messaging.onBackgroundMessage((payload) => {
     console.log('[firebase-messaging-sw.js] Received background message ', payload);
     // Customize notification here
     const notificationTitle = 'Históricas del día';
@@ -26,6 +26,5 @@ onBackgroundMessage(messaging, (payload) => {
         click_action : "https://test-push-firebase.vercel.app/"
     };
 
-    self.registration.showNotification(notificationTitle,
-        notificationOptions);
+    self.registration.showNotification(notificationTitle, notificationOptions);
 });
