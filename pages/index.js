@@ -1,11 +1,61 @@
 import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
+import { useEffect, useState } from 'react'
 
-const inter = Inter({ subsets: ['latin'] })
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken } from "firebase/messaging";
 
 export default function Home() {
+
+  const [token, setToken] = useState();
+
+  useEffect(() => {
+
+    function requestPermission() {
+      console.log('Requesting permission...');
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+        }
+      })
+    }
+
+    requestPermission();
+
+    // Import the functions you need from the SDKs you need
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey:process.env.NEXT_PUBLIC_apiKey,
+      authDomain:process.env.NEXT_PUBLIC_authDomain,
+      projectId:process.env.NEXT_PUBLIC_projectId,
+      storageBucket:process.env.NEXT_PUBLIC_storageBucket,
+      messagingSenderId:process.env.NEXT_PUBLIC_messagingSenderId,
+      appId:process.env.NEXT_PUBLIC_appId
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    // Initialize Firebase Cloud Messaging and get a reference to the service
+    const messaging = getMessaging(app);
+    // Add the public key generated from the console here.
+    getToken(messaging, {vapidKey: process.env.NEXT_PUBLIC_vapidKey})
+      .then((currentToken) => {
+        if (currentToken) {
+          // Send the token to your server and update the UI if necessary
+          setToken(currentToken)
+          // ...
+        } else {
+          // Show permission request UI
+          console.log('No registration token available. Request permission to generate one.');
+          // ...
+        }
+      })
+
+  }, [])
+
   return (
     <>
       <Head>
@@ -15,108 +65,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.js</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
-        </div>
+        <h1>Notificaciones</h1>
+        {
+          token && <p>{token}</p>
+        }
       </main>
     </>
   )
