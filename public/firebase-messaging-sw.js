@@ -26,5 +26,5 @@ messaging.onBackgroundMessage((payload) => {
         click_action : "https://test-push-firebase.vercel.app/"
     };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+    // self.registration.showNotification(notificationTitle, notificationOptions);
 });
